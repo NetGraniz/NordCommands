@@ -8,7 +8,7 @@ if ($QueueProject) {
     if ($LASTEXITCODE -ne 0) { throw 'NordQueue dependency build failed.' }
 }
 & $MavenCommand -B -ntp -f (Join-Path $PSScriptRoot 'pom.xml') clean verify
-if ($LASTEXITCODE -ne 0) { throw 'NordCommandsPaper build or tests failed.' }
-$jar = Join-Path $PSScriptRoot 'target/NordCommands-Paper-1.2.0.jar'
+if ($LASTEXITCODE -ne 0) { throw 'NordCommands build or tests failed.' }
+$jar = Join-Path $PSScriptRoot 'target/NordCommands-2.0.0.jar'
 if (-not (Test-Path -LiteralPath $jar -PathType Leaf)) { throw 'Expected release JAR missing.' }
 Get-FileHash -LiteralPath $jar -Algorithm SHA256

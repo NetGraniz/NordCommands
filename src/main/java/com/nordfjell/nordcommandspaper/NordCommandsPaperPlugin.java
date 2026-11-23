@@ -1,5 +1,6 @@
 package com.nordfjell.nordcommandspaper;
 
+import dev.nordfjell.perms.PaperPermissionsFeature;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
@@ -28,6 +29,7 @@ public final class NordCommandsPaperPlugin extends JavaPlugin implements Listene
     private Path configPath;
     private ScheduledTask pump;
     private volatile boolean accepting;
+    private PaperPermissionsFeature permissions;
 
     @Override public void onEnable() {
         saveDefaultConfig();
@@ -37,11 +39,14 @@ public final class NordCommandsPaperPlugin extends JavaPlugin implements Listene
         reload = new ReloadGate<>("NordCommands-policy-reader");
         accepting = true;
         getServer().getPluginManager().registerEvents(this, this);
+        permissions = new PaperPermissionsFeature(this);
+        permissions.enable();
         pump = Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, ignored -> tick(), 1, 1);
-        getLogger().info("NordCommands 1.1.0: policy " + (settings == null ? "blocked" : "ready (" + settings.allowed().size() + " labels)") + ".");
+        getLogger().info("NordCommands 2.0.0: policy " + (settings == null ? "blocked" : "ready (" + settings.allowed().size() + " labels)") + ".");
     }
     @Override public void onDisable() {
         accepting = false;
+        if (permissions != null) permissions.disable();
         if (pump != null) pump.cancel();
         if (reload != null) reload.close();
         refresh.clear(); noticeAt.clear(); requester = null; settings = null;
@@ -111,6 +116,7 @@ public final class NordCommandsPaperPlugin extends JavaPlugin implements Listene
 
     @Override public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
                                        @NotNull String label, @NotNull String[] args) {
+        if (command.getName().equalsIgnoreCase("nordperms")) return permissions != null && permissions.command(sender, args);
         if (sender instanceof Player player && !Bukkit.isOwnedByCurrentRegion(player)) { getLogger().warning("Rejected off-region command-policy management."); return true; }
         if (!sender.hasPermission("nordcommands.admin")) {
             sender.sendMessage(Component.text("You do not have permission.")); return true;
@@ -131,5 +137,11 @@ public final class NordCommandsPaperPlugin extends JavaPlugin implements Listene
             return true;
         }
         sender.sendMessage(Component.text("Usage: /nordcommands <reload|health>")); return true;
+    }
+
+    @Override public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
+                                                @NotNull String alias, @NotNull String[] args) {
+        if (command.getName().equalsIgnoreCase("nordperms")) return permissions == null ? List.of() : permissions.tab(sender, args);
+        return args.length == 1 && sender.hasPermission("nordcommands.admin") ? List.of("reload", "health") : List.of();
     }
 }

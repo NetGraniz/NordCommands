@@ -1,0 +1,18 @@
+# Integrated NordPerms policy. Reload with "nordperms reload" from the console.
+schema-version: 1
+groups:
+  players:
+    permissions:
+      nordregen.use: false
+      nordauth.admin.resetpassword: false
+      nordcommands.admin: false
+      nordcommands.bypass: false
+      nordfireworks.bypass: false
+      minecraft.command.op: false
+      minecraft.command.deop: false
+      bukkit.command.reload: false
+  moderators:
+    permissions:
+      nordregen.use: true
+      nordauth.admin.resetpassword: true
+members: {}

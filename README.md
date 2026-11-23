@@ -1,56 +1,34 @@
-# NordCommands 1.2.0 — Paper/Folia
+# NordCommands 2.0.0
 
-Command allowlist and command-tree filtering for Paper 26.2 and Folia 26.2. One Java 25 JAR supports both platforms.
+One universal JAR for Paper, Folia, and Velocity. It combines command visibility/execution policy, the former NordCommandsVelocity module, and the former NordPerms permission policy.
 
-## Command policy
+## Files
 
-`allowed-commands` contains command labels, not permissions. Allowing `tempban`, for example, only lets the command reach its handler; the player still needs the permission checked by the ban plugin.
+- `config.yml` — allowed command labels and denial text.
+- `permissions.yml` — immutable `players`/`moderators` permission policy.
 
-The bundled allowlist is empty. Configure the authentication and player commands your server needs before admitting players.
+The Paper/Folia plugin imports `plugins/NordPerms/config.yml` into `plugins/NordCommands/permissions.yml` on first start when the new file does not exist. Installed data is never published with the repository.
 
-NordCommands checks the original command at LOWEST and the current command text at HIGHEST, while respecting earlier cancellation. This blocks ordinary-priority rewrites to forbidden or namespaced roots without changing command arguments.
+## Reload
 
-Namespaced commands are blocked unless the player has bypass. An administrator can still use the plugin's own `nordcommands:nordcommands` management command.
+- `/nordcommands reload` validates and atomically reloads both Velocity files, or the command policy on Paper/Folia.
+- `/nordcommands health` reports active policy state.
+- `nordperms reload` and `nordperms status` remain console-only compatibility commands on Paper/Folia.
 
-Console commands are not filtered.
+Malformed, oversized, duplicate-key, wildcard, or unknown policy input is rejected. A failed reload retains the previous immutable snapshot.
 
-## Permissions
+## Identity safety
 
-| Permission | Allows | Default |
-| --- | --- | --- |
-| `nordcommands.admin` | `/nordcommands health` and `/nordcommands reload` | Operators |
-| `nordcommands.bypass` | Bypass the ordinary command allowlist and visibility filter when the policy is valid | Operators |
+On offline-mode Paper/Folia, moderator UUIDs receive elevated rights only after NordAuth confirms the session. On Velocity, there is no trusted NordAuth session bridge; therefore offline-mode proxy connections receive only the `players` policy. This prevents a spoofed UUID from receiving moderator proxy permissions. Online-mode Velocity connections may use UUID assignments.
 
-Bypass does not grant another plugin's command permissions. It also does not grant access to NordCommands management: the owned management root still requires `nordcommands.admin`.
+The provider rejects OP accounts and refuses to coexist with LuckPerms on Paper/Folia. Do not hot-load, hot-disable, or use server `/reload`.
 
-To expose only selected moderator commands, keep bypass denied, add their labels to `allowed-commands` and grant their actual permissions through your permission provider.
+## Build
 
-## Configuration and reload
+Use Maven 3.9+ and JDK 25:
 
-Keep your existing `plugins/NordCommands/config.yml`. Labels must be bare command roots: no leading slash, arguments, namespace or whitespace. Wrong types, unknown keys, malformed YAML and oversized input are rejected.
+```text
+mvn -B -ntp clean verify
+```
 
-An invalid initial policy blocks player commands, including bypass users, except authorized management commands. An invalid reload keeps the last valid policy.
-
-Reload uses one bounded asynchronous file reader. A second request is rejected while the first is pending. Wait for the explicit success or rejection message in the console. Client command trees refresh at 8 players per tick, with at most 4096 pending entries. Overflow may leave a client tree stale; command execution still uses the new policy.
-
-## Limits
-
-| Input or queue | Limit |
-| --- | --- |
-| Configuration file | 1 MiB |
-| Allowlist | 256 entries |
-| Command label | 64 characters |
-| Denial message | 512 characters |
-| Command input | 32767 characters |
-| Reload | One request/result |
-| Pending command-tree refreshes | 4096 |
-
-Quit handling releases player state. Normal shutdown cancels owned work. Hot reload and hot replacement are unsupported. Production deployment is a separate stopped-server operation: retain the installed policy and keep production data private. Use only isolated local fixtures for synthetic runtime tests.
-
-## Build and tests
-
-Use Maven 3.9+ and JDK 25: `mvn clean verify` or `./build.ps1`. The output is `target/NordCommands-Paper-1.2.0.jar`; no active server directory is needed. See [BUILDING.md](BUILDING.md) and [FOLIA.md](FOLIA.md).
-
-Regression tests run with assertions enabled. `test-support/integration.cjs` uses fresh loopback-only fixtures. Its `--baseline` mode accepts an unchanged older JAR for a controlled reproduction, not as a source for patches. `CommandsTestProbe` is test-only and is not packaged in the release JAR.
-
-The historical security report is `SECURITY-1.1.0.md`. Reports matching `SECURITY-*.md` are excluded from the public repository.
+The release artifact is `target/NordCommands-2.0.0.jar`. Install the same file on Paper/Folia and Velocity.

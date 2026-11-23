@@ -9,13 +9,13 @@ import org.yaml.snakeyaml.*;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 /** Immutable, strictly parsed policy. Never coerces an argument-bearing entry into a root. */
-record CommandSettings(Set<String> allowed, String deniedMessage) {
+public record CommandSettings(Set<String> allowed, String deniedMessage) {
     static final int MAX_BYTES = 1024 * 1024, MAX_COMMANDS = 256;
-    CommandSettings {
+    public CommandSettings {
         allowed = Set.copyOf(allowed);
         Objects.requireNonNull(deniedMessage);
     }
-    static CommandSettings load(Path file) throws IOException {
+    public static CommandSettings load(Path file) throws IOException {
         if (!Files.isRegularFile(file) || Files.size(file) > MAX_BYTES)
             throw new IOException("Configuration missing, unreadable or oversized.");
         try {
@@ -53,7 +53,7 @@ record CommandSettings(Set<String> allowed, String deniedMessage) {
             throw new IOException("Invalid YAML.", e);
         }
     }
-    boolean allows(String label) {
+    public boolean allows(String label) {
         return label != null && !label.contains(":") && allowed.contains(label.toLowerCase(Locale.ROOT));
     }
 }

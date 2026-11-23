@@ -1,6 +1,6 @@
-# Paper / Folia compatibility — 1.2.0
+# Paper / Folia compatibility — 2.0.0
 
-Use `NordCommands-Paper-1.2.0.jar` on either platform with JDK 25. Entity/global scheduler APIs support both platforms; no separate branch is needed.
+Use `NordCommands-2.0.0.jar` on Paper, Folia, or Velocity with JDK 25. Entity/global scheduler APIs support both backend platforms; no separate branch is needed.
 
 Player command checks and command-tree refreshes run on the owning region. Reload completion and bounded refresh pump use the global scheduler. Preserve the installed allowlist, including authentication commands; the default allowlist remains empty.
 

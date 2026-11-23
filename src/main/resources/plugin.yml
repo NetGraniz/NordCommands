@@ -5,12 +5,16 @@ api-version: '26.2'
 folia-supported: true
 author: Nord Fjell
 description: Minimal Paper command visibility and execution filter for Nord Fjell.
+softdepend: [NordAuth, LuckPerms]
 
 commands:
   nordcommands:
     description: Reload the NordCommands Paper configuration.
     usage: /nordcommands <reload|health>
     permission: nordcommands.admin
+  nordperms:
+    description: Reload or inspect the integrated permission policy.
+    usage: /nordperms <reload|status>
 
 permissions:
   nordcommands.admin:
