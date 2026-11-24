@@ -4,12 +4,11 @@ The supported release build uses Maven 3.9+ and JDK 25 on Windows, Linux or macO
 Set JAVA_HOME to your own JDK 25 installation and put Maven on PATH. No live server
 folder, private configuration, prebuilt old plugin, or machine-specific path is required.
 
-## Build and tests
+## Build
 
 From this project's root, run `mvn clean verify`, or on PowerShell run
 `./build.ps1`. The wrapper accepts `-MavenCommand /path/to/mvn`.
 The JAR is `target/NordCommands-3.0.0.jar` and contains both platform descriptors.
-Existing main-based regression checks are run by the JUnit adapter with assertions enabled.
 
 
 Only plugin metadata resources are filtered for the release version. Configuration
