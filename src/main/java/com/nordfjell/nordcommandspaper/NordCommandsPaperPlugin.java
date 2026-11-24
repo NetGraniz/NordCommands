@@ -42,7 +42,7 @@ public final class NordCommandsPaperPlugin extends JavaPlugin implements Listene
         permissions = new PaperPermissionsFeature(this);
         permissions.enable();
         pump = Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, ignored -> tick(), 1, 1);
-        getLogger().info("NordCommands 2.0.0: policy " + (settings == null ? "blocked" : "ready (" + settings.allowed().size() + " labels)") + ".");
+        getLogger().info("NordCommands 3.0.0: policy " + (settings == null ? "blocked" : "ready (" + settings.allowed().size() + " labels)") + ".");
     }
     @Override public void onDisable() {
         accepting = false;
@@ -116,12 +116,14 @@ public final class NordCommandsPaperPlugin extends JavaPlugin implements Listene
 
     @Override public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
                                        @NotNull String label, @NotNull String[] args) {
-        if (command.getName().equalsIgnoreCase("nordperms")) return permissions != null && permissions.command(sender, args);
         if (sender instanceof Player player && !Bukkit.isOwnedByCurrentRegion(player)) { getLogger().warning("Rejected off-region command-policy management."); return true; }
         if (!sender.hasPermission("nordcommands.admin")) {
             sender.sendMessage(Component.text("You do not have permission.")); return true;
         }
         if (!accepting) { sender.sendMessage(Component.text("Command policy is shutting down.")); return true; }
+        if (args.length >= 2 && args[0].equalsIgnoreCase("permissions")) {
+            return permissions != null && permissions.command(sender, Arrays.copyOfRange(args, 1, args.length));
+        }
         if (args.length == 1 && args[0].equalsIgnoreCase("health")) {
             sender.sendMessage(Component.text("NordCommands: " + (settings == null ? "blocked" : "ready")
                     + ", labels=" + (settings == null ? 0 : settings.allowed().size())
@@ -136,12 +138,14 @@ public final class NordCommandsPaperPlugin extends JavaPlugin implements Listene
             }
             return true;
         }
-        sender.sendMessage(Component.text("Usage: /nordcommands <reload|health>")); return true;
+        sender.sendMessage(Component.text("Usage: /nordcommands <reload|health|permissions>")); return true;
     }
 
     @Override public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
                                                 @NotNull String alias, @NotNull String[] args) {
-        if (command.getName().equalsIgnoreCase("nordperms")) return permissions == null ? List.of() : permissions.tab(sender, args);
-        return args.length == 1 && sender.hasPermission("nordcommands.admin") ? List.of("reload", "health") : List.of();
+        if (!sender.hasPermission("nordcommands.admin")) return List.of();
+        if (args.length == 1) return List.of("reload", "health", "permissions");
+        if (args.length == 2 && args[0].equalsIgnoreCase("permissions")) return List.of("reload", "status");
+        return List.of();
     }
 }

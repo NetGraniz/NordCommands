@@ -1,13 +1,5 @@
-# Paper / Folia compatibility — 2.0.0
+# Paper and Folia compatibility
 
-Use `NordCommands-2.0.0.jar` on Paper, Folia, or Velocity with JDK 25. Entity/global scheduler APIs support both backend platforms; no separate branch is needed.
+NordCommands 3.0.0 supports Paper, Folia, and Velocity on Java 25. Player command checks and command-tree refreshes run on the owning entity scheduler. Reload completion uses the global-region scheduler, and file parsing runs outside region callbacks.
 
-Player command checks and command-tree refreshes run on the owning region. Reload completion and bounded refresh pump use the global scheduler. Preserve the installed allowlist, including authentication commands; the default allowlist remains empty.
-
-## Verification and limits
-
-Run `mvn clean verify`. The [isolated integration harness](https://github.com/NetGraniz/NordChat/tree/main/test-support) boots all eight adapted plugins together with synthetic loopback clients, separated regions, local HTTPS and synthetic data. Movement cancellation dispatches an owning-region PlayerMoveEvent, not real-client movement. Never install the helper JAR on a real server. The harness records runtime results outside the repository. This is not a 1000-player load test, a production database test or a guarantee for future Minecraft versions.
-
-## Updating
-
-Back up configuration and player data, stop the server, replace only this plugin JAR without duplicates, and preserve installed data. Do not overwrite working config with repository templates. This release does not migrate worlds or production data.
+Run `mvn clean verify` before deployment. Preserve the current `plugins/NordCommands` directory and replace only the plugin JAR while the server is stopped.

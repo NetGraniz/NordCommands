@@ -1,4 +1,4 @@
-# Integrated NordPerms policy. Reload with "nordperms reload" from the console.
+# NordCommands permission policy. Reload with "nordcommands permissions reload" from the console.
 schema-version: 1
 groups:
   players:

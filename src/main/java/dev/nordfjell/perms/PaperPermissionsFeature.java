@@ -35,10 +35,8 @@ public final class PaperPermissionsFeature implements Listener {
         io = Executors.newSingleThreadExecutor(Thread.ofPlatform().name("NordCommands-permissions").daemon(true).factory());
         Bukkit.getPluginManager().registerEvents(this, host);
         policyPath = host.getDataFolder().toPath().resolve("permissions.yml");
-        migrateLegacyPolicy();
         if (!Files.exists(policyPath)) host.saveResource("permissions.yml", false);
         try {
-            if (Bukkit.getPluginManager().getPlugin("LuckPerms") != null) throw new IllegalStateException("Remove LuckPerms before starting the integrated permission provider");
             injector.validatePlatform(); updateRegistry();
             engine.auth = new AuthGate(Bukkit.getPluginManager().getPlugin("NordAuth"), Bukkit.getOnlineMode());
             source = loader.load(policyPath);
@@ -50,16 +48,6 @@ public final class PaperPermissionsFeature implements Listener {
             engine.policy.set(null);
         }
         if (!Bukkit.getOnlinePlayers().isEmpty()) fatal("Live permission-provider loading is unsupported; use a full restart");
-    }
-
-    private void migrateLegacyPolicy() {
-        Path legacy = host.getDataFolder().toPath().resolveSibling("NordPerms").resolve("config.yml");
-        try {
-            if (!Files.exists(policyPath) && Files.isRegularFile(legacy)) {
-                Files.createDirectories(policyPath.getParent()); Files.copy(legacy, policyPath);
-                host.getLogger().info("Imported legacy NordPerms configuration into permissions.yml.");
-            }
-        } catch (Exception error) { host.getLogger().warning("Could not import legacy NordPerms config: " + error.getClass().getSimpleName()); }
     }
 
     public void disable() {
@@ -104,7 +92,6 @@ public final class PaperPermissionsFeature implements Listener {
 
     @EventHandler public void enabled(PluginEnableEvent event) {
         if (closing.get()) return;
-        if (event.getPlugin().getName().equals("LuckPerms")) { fatal("Conflicting LuckPerms provider enabled"); return; }
         if (event.getPlugin().getName().equals("NordAuth")) engine.auth = new AuthGate(event.getPlugin(), Bukkit.getOnlineMode());
         try { updateRegistry(); if (source != null) engine.policy.set(PermissionEngine.expand(source, registry)); }
         catch (Exception error) { fatal("Cannot expand registered permission children"); }
@@ -129,7 +116,6 @@ public final class PaperPermissionsFeature implements Listener {
         }
         if (args.length != 1 || !args[0].equalsIgnoreCase("reload")) return false;
         if (closing.get() || Bukkit.isStopping()) { sender.sendMessage("Refused: server is stopping."); return true; }
-        if (Bukkit.getPluginManager().getPlugin("LuckPerms") != null) { sender.sendMessage("Refused: LuckPerms is present."); return true; }
         if (!loading.compareAndSet(false, true)) { sender.sendMessage("Permission reload already in progress."); return true; }
         io.execute(() -> {
             try {
