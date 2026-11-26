@@ -14,8 +14,8 @@ final class AuthGate {
         Method method = null;
         if (auth != null && auth.getClass().getName().equals("dev.nordfjell.auth.NordAuthPlugin")) {
             try {
-                method = auth.getClass().getDeclaredMethod("isAuthenticated", Player.class);
-                if (method.getReturnType() != boolean.class || !method.trySetAccessible()) method = null;
+                method = auth.getClass().getMethod("isAuthenticated", Player.class);
+                if (method.getReturnType() != boolean.class) method = null;
             } catch (ReflectiveOperationException | RuntimeException ignored) { method = null; }
         }
         this.check = method;

@@ -26,7 +26,7 @@ public final class PaperPermissionsFeature implements Listener {
     private volatile Policy source;
     private volatile Map<String, Permission> registry = Map.of();
     private ExecutorService io;
-    private boolean started;
+    private volatile boolean started;
     private Path policyPath;
 
     public PaperPermissionsFeature(JavaPlugin host) { this.host = host; }

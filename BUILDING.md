@@ -8,7 +8,7 @@ folder, private configuration, prebuilt old plugin, or machine-specific path is 
 
 From this project's root, run `mvn clean verify`, or on PowerShell run
 `./build.ps1`. The wrapper accepts `-MavenCommand /path/to/mvn`.
-The JAR is `target/NordCommands-3.0.0.jar` and contains both platform descriptors.
+The JAR is `target/NordCommands-3.0.1.jar` and contains both platform descriptors.
 
 
 Only plugin metadata resources are filtered for the release version. Configuration

@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import net.kyori.adventure.text.Component;
 import org.slf4j.Logger;
 
-@Plugin(id="nordcommands", name="NordCommands", version="3.0.0",
+@Plugin(id="nordcommands", name="NordCommands", version="3.0.1",
         description="Universal command and permission policy for Paper, Folia, and Velocity", authors={"Nord Fjell"})
 public final class NordCommandsVelocityPlugin {
     private final ProxyServer proxy; private final Logger logger; private final Path dataDirectory;
@@ -47,7 +47,7 @@ public final class NordCommandsVelocityPlugin {
         }
         var command = proxy.getCommandManager().metaBuilder("nordcommands").plugin(this).build();
         proxy.getCommandManager().register(command, new ManagementCommand());
-        logger.info("NordCommands 3.0.0 enabled: command labels={}, permission policy={}", settings == null ? 0 : settings.allowed().size(), policy == null ? "blocked" : "ready");
+        logger.info("NordCommands 3.0.1 enabled: command labels={}, permission policy={}", settings == null ? 0 : settings.allowed().size(), policy == null ? "blocked" : "ready");
     }
 
     private void copyDefault(String name, Path target) throws IOException {
@@ -71,7 +71,7 @@ public final class NordCommandsVelocityPlugin {
         if (!(event.getCommandSource() instanceof Player player) || canBypass(player)) return;
         String originalText = event.getCommand(); String original = CommandInput.label(originalText);
         String effectiveText = event.getResult().getCommand().orElse(originalText);
-        String effective = effectiveText == originalText ? original : CommandInput.label(effectiveText);
+        String effective = effectiveText.equals(originalText) ? original : CommandInput.label(effectiveText);
         boolean invalid = original == null || effective == null;
         boolean blockedProxyCommand = !invalid && ((proxy.getCommandManager().hasCommand(original) && !allowed(original))
                 || (proxy.getCommandManager().hasCommand(effective) && !allowed(effective)));
