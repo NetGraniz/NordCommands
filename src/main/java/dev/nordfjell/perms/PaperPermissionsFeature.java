@@ -38,10 +38,11 @@ public final class PaperPermissionsFeature implements Listener {
         if (!Files.exists(policyPath)) host.saveResource("permissions.yml", false);
         try {
             injector.validatePlatform(); updateRegistry();
-            engine.auth = new AuthGate(Bukkit.getPluginManager().getPlugin("NordAuth"), Bukkit.getOnlineMode());
+            engine.trustedVelocityIdentity = VelocityIdentityTrust.load(Path.of("config", "paper-global.yml"));
             source = loader.load(policyPath);
             engine.policy.set(PermissionEngine.expand(source, registry)); started = true;
-            if (!engine.auth.ready()) host.getLogger().warning("No trusted identity provider: moderator permissions remain denied");
+            if (!engine.trustedVelocityIdentity)
+                host.getLogger().warning("Velocity Modern Forwarding is not configured for online-mode identities; moderator permissions remain denied");
             host.getLogger().info("Integrated permissions ready; " + source.members().size() + " moderator UUIDs.");
         } catch (Exception error) {
             host.getLogger().severe("Permission provider startup refused: " + error.getClass().getSimpleName() + ". Check permissions.yml and provider compatibility.");
@@ -75,24 +76,8 @@ public final class PaperPermissionsFeature implements Listener {
         catch (Exception error) { fatal("Cannot install or verify permissible on join"); }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void protectAccounts(PlayerCommandPreprocessEvent event) {
-        String[] arguments = event.getMessage().substring(1).trim().split("\\s+", 4);
-        String label = arguments[0].toLowerCase(Locale.ROOT); if (label.contains(":")) label = label.substring(label.indexOf(':') + 1);
-        Policy snapshot = engine.policy.get();
-        if (label.equals("register") && snapshot != null && snapshot.members().contains(event.getPlayer().getUniqueId())) {
-            event.setCancelled(true); event.getPlayer().sendMessage("Staff accounts must already be registered before their UUID is added to permissions.yml."); return;
-        }
-        if (!label.equals("resetpassword") || arguments.length < 2) return;
-        Player target = Bukkit.getPlayerExact(arguments[1]);
-        if (snapshot == null || target == null || target.getUniqueId().equals(event.getPlayer().getUniqueId()) || snapshot.members().contains(target.getUniqueId()) || target.isOp()) {
-            event.setCancelled(true); event.getPlayer().sendMessage("Staff/self/offline password recovery is console-only.");
-        }
-    }
-
     @EventHandler public void enabled(PluginEnableEvent event) {
         if (closing.get()) return;
-        if (event.getPlugin().getName().equals("NordAuth")) engine.auth = new AuthGate(event.getPlugin(), Bukkit.getOnlineMode());
         try { updateRegistry(); if (source != null) engine.policy.set(PermissionEngine.expand(source, registry)); }
         catch (Exception error) { fatal("Cannot expand registered permission children"); }
     }
@@ -112,7 +97,7 @@ public final class PaperPermissionsFeature implements Listener {
         if (args.length == 1 && args[0].equalsIgnoreCase("status")) {
             Policy active = engine.policy.get();
             sender.sendMessage("NordCommands permissions: " + (active == null ? "UNAVAILABLE" : "ready; moderator UUIDs=" + active.members().size())
-                + "; trusted identity=" + (engine.auth != null && engine.auth.ready())); return true;
+                + "; Velocity online identity=" + engine.trustedVelocityIdentity); return true;
         }
         if (args.length != 1 || !args[0].equalsIgnoreCase("reload")) return false;
         if (closing.get() || Bukkit.isStopping()) { sender.sendMessage("Refused: server is stopping."); return true; }

@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>dev.nordfjell</groupId>
   <artifactId>nordcommands</artifactId>
-  <version>3.0.1</version>
+  <version>3.0.2</version>
   <name>NordCommands</name>
   <properties>
     <maven.compiler.release>25</maven.compiler.release>

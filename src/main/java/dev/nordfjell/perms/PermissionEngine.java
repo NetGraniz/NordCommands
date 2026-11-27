@@ -7,11 +7,10 @@ import org.bukkit.permissions.Permission;
 
 final class PermissionEngine {
     final AtomicReference<Policy> policy = new AtomicReference<>();
-    volatile AuthGate auth;
+    volatile boolean trustedVelocityIdentity;
 
     Map<String, Boolean> permissions(Policy snapshot, Player player) {
-        UUID id = player.getUniqueId();
-        return snapshot.permissions(id, snapshot.members().contains(id) && auth.authenticated(player));
+        return snapshot.permissions(player.getUniqueId(), trustedVelocityIdentity);
     }
 
     static Policy expand(Policy raw, Map<String, Permission> registry) {

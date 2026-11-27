@@ -20,8 +20,8 @@ public record Policy(Map<String, Boolean> players, Map<String, Boolean> moderato
         return new Policy(basic, staff, members);
     }
 
-    public Map<String, Boolean> permissions(UUID uuid, boolean authenticated) {
-        return authenticated && members.contains(uuid) ? moderators : players;
+    public Map<String, Boolean> permissions(UUID uuid, boolean trustedIdentity) {
+        return trustedIdentity && members.contains(uuid) ? moderators : players;
     }
 
     public static String normalize(String node) {

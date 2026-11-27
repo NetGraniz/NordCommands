@@ -42,7 +42,7 @@ public final class NordCommandsPaperPlugin extends JavaPlugin implements Listene
         permissions = new PaperPermissionsFeature(this);
         permissions.enable();
         pump = Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, ignored -> tick(), 1, 1);
-        getLogger().info("NordCommands 3.0.1: policy " + (settings == null ? "blocked" : "ready (" + settings.allowed().size() + " labels)") + ".");
+        getLogger().info("NordCommands 3.0.2: policy " + (settings == null ? "blocked" : "ready (" + settings.allowed().size() + " labels)") + ".");
     }
     @Override public void onDisable() {
         accepting = false;

@@ -4,7 +4,6 @@ groups:
   players:
     permissions:
       nordregen.use: false
-      nordauth.admin.resetpassword: false
       nordcommands.admin: false
       nordcommands.bypass: false
       nordfireworks.bypass: false
@@ -14,5 +13,4 @@ groups:
   moderators:
     permissions:
       nordregen.use: true
-      nordauth.admin.resetpassword: true
 members: {}

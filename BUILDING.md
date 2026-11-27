@@ -8,7 +8,7 @@ folder, private configuration, prebuilt old plugin, or machine-specific path is 
 
 From this project's root, run `mvn clean verify`, or on PowerShell run
 `./build.ps1`. The wrapper accepts `-MavenCommand /path/to/mvn`.
-The JAR is `target/NordCommands-3.0.1.jar` and contains both platform descriptors.
+The JAR is `target/NordCommands-3.0.2.jar` and contains both platform descriptors.
 
 
 Only plugin metadata resources are filtered for the release version. Configuration
@@ -24,5 +24,5 @@ configure your own server values. Do not publish installed config files or playe
 stores. Existing configuration must be backed up and reviewed before updating.
 No deployment or server configuration change is performed by the build.
 
-The bundled allowed-commands list is empty. Configure the desired command policy,
-including required authentication commands, before admitting players.
+The bundled allowed-commands list is empty. Configure the desired command policy
+before admitting players.
