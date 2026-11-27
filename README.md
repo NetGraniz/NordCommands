@@ -22,4 +22,4 @@ Build with Maven 3.9+ and JDK 25. The release artifact is `target/NordCommands-3
 
 ## License
 
-Current development on `main` is licensed under [GNU GPL v3.0 only](LICENSE). The latest published release remains available under the MIT License stated on its release page.
+Current development and releases starting with 3.0.2 are licensed under [GNU GPL v3.0 only](LICENSE). Releases through 3.0.1 remain under the license stated on their release pages.
